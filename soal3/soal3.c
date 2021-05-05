@@ -27,13 +27,59 @@ struct FileMoveRequest {
     char *folderName;
 };
 
-// Initialize FileMoveRequest
-struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName) {
-    struct FileMoveRequest *r = malloc(sizeof(struct FileMoveRequest));
-    r->index = index;
-    r->filename = filename;
-    r->folderName = folderName;
-    return r;
+struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName);
+int parseFilesInput(int argc, char **argv, struct AppManager* app, char *cwd);
+char * getfolderName(char *filename);
+char * mergeFileWithFolderName(char * filename, char * folderName);
+char *getFileName(char *full_path);
+void *moveFile(void *ptr);
+int parseByFileList(struct AppManager* app, char **listOfFiles, int listOfFilesCount, char *output);
+void listFiles(const char *path, const char *beforePath, char** argv, int* pointer);
+
+int main(int argc, char** argv)
+{
+    //init our app config
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+
+    struct AppManager app;
+    app.fileParse = false;
+    app.starParse = false;
+    app.folderParse = false;
+    (&app)->listOfFiles = malloc(argc * sizeof(char*));
+    app.listOfFilesCount = 0;
+
+    // read input
+    for (int i=0; i<argc; i++) {
+        if(strcmp(argv[i], "-f") == 0) {
+            app.fileParse = true;
+
+            parseFilesInput(argc, argv, &app, cwd);
+            
+            break;
+        } else if(strcmp(argv[i], "*") == 0) {
+            app.starParse = true;
+            break;
+        } else if(strcmp(argv[i], "-d") == 0) {
+            app.folderParse = true;
+            strcpy(cwd, argv[2]);
+            break;
+        }
+    }
+    
+    // preparing parameters for process
+    if(app.starParse || app.folderParse) {
+        listFiles(cwd, cwd, (&app)->listOfFiles, &app.listOfFilesCount);
+    }
+
+    for(int i =0;i<app.listOfFilesCount;i++) {
+        printf("%s\n", (&app)->listOfFiles[i]);
+    }
+
+    // run process
+    parseByFileList(&app, (&app)->listOfFiles, app.listOfFilesCount, cwd);
+  
+    return 0;
 }
 
 // Parse input for option `-f`
@@ -187,50 +233,4 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
 
     // Close directory stream
     closedir(dir);
-}
-
-int main(int argc, char** argv)
-{
-    //init our app config
-    char cwd[1024];
-    getcwd(cwd, sizeof(cwd));
-
-    struct AppManager app;
-    app.fileParse = false;
-    app.starParse = false;
-    app.folderParse = false;
-    (&app)->listOfFiles = malloc(argc * sizeof(char*));
-    app.listOfFilesCount = 0;
-
-    // read input
-    for (int i=0; i<argc; i++) {
-        if(strcmp(argv[i], "-f") == 0) {
-            app.fileParse = true;
-
-            parseFilesInput(argc, argv, &app, cwd);
-            
-            break;
-        } else if(strcmp(argv[i], "*") == 0) {
-            app.starParse = true;
-            break;
-        } else if(strcmp(argv[i], "-d") == 0) {
-            app.folderParse = true;
-            strcpy(cwd, argv[2]);
-            break;
-        }
-    }
-    
-    // preparing parameters for process
-    if(app.starParse || app.folderParse) {
-        listFiles(cwd, cwd, (&app)->listOfFiles, &app.listOfFilesCount);
-    }
-
-    for(int i =0;i<app.listOfFilesCount;i++) {
-        printf("%s\n", (&app)->listOfFiles[i]);
-    }
-
-    // run process
-    parseByFileList(&app, (&app)->listOfFiles, app.listOfFilesCount, cwd);
-  
-    return 0;
 }
