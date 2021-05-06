@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void main() {
+void main (int argc, char ** argv) {
   int pipe_ps_to_sort[2];
   if (pipe(pipe_ps_to_sort) == -1) {
     perror("pipe failed");
@@ -21,7 +21,8 @@ void main() {
     close(pipe_ps_to_sort[0]);
     close(pipe_ps_to_sort[1]);
     
-    execlp("ps", "ps", "aux", NULL);
+    char * args[] = {"ps", "aux", NULL};
+    execv("/bin/ps", args);
   }
   
   if (fork() == 0) {
@@ -33,7 +34,8 @@ void main() {
     close(pipe_sort_to_head[0]);
     close(pipe_sort_to_head[1]);
     
-    execlp("sort", "sort", "-nrk", "3,3", NULL);
+    char * args[] = {"sort", "-nrk", "3,3", NULL};
+    execv("/bin/sort", args);
   }
 
   close(pipe_ps_to_sort[0]);
@@ -45,7 +47,8 @@ void main() {
     close(pipe_sort_to_head[0]);
     close(pipe_sort_to_head[1]);
     
-    execlp("head", "head", "-5", NULL);
+    char * args[] = {"head", "-5", NULL};
+    execv("/bin/head", args);
   }
 
   close(pipe_sort_to_head[0]);
