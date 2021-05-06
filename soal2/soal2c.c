@@ -16,9 +16,8 @@ void main (int argc, char ** argv) {
   }
 
   if (fork() == 0) {
-    dup2(pipe_ps_to_sort[1], 1);
-
     close(pipe_ps_to_sort[0]);
+    dup2(pipe_ps_to_sort[1], 1);
     close(pipe_ps_to_sort[1]);
     
     char * args[] = {"ps", "aux", NULL};
@@ -26,12 +25,12 @@ void main (int argc, char ** argv) {
   }
   
   if (fork() == 0) {
-    dup2(pipe_ps_to_sort[0], 0);
-    dup2(pipe_sort_to_head[1], 1);
-    
-    close(pipe_ps_to_sort[0]);
     close(pipe_ps_to_sort[1]);
+    dup2(pipe_ps_to_sort[0], 0);
+    close(pipe_ps_to_sort[0]);
+    
     close(pipe_sort_to_head[0]);
+    dup2(pipe_sort_to_head[1], 1);
     close(pipe_sort_to_head[1]);
     
     char * args[] = {"sort", "-nrk", "3,3", NULL};
@@ -42,10 +41,9 @@ void main (int argc, char ** argv) {
   close(pipe_ps_to_sort[1]);
 
   if (fork() == 0) {
-    dup2(pipe_sort_to_head[0], 0);
-    
-    close(pipe_sort_to_head[0]);
     close(pipe_sort_to_head[1]);
+    dup2(pipe_sort_to_head[0], 0);
+    close(pipe_sort_to_head[0]);
     
     char * args[] = {"head", "-5", NULL};
     execv("/bin/head", args);
