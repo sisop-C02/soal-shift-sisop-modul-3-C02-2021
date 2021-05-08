@@ -27,6 +27,8 @@ struct FileMoveRequest {
     char *folderName;
 };
 
+int folderBerhasil = true;
+
 struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName);
 int parseFilesInput(int argc, char **argv, struct AppManager* app, char *cwd);
 char* getfolderName(char *filename);
@@ -78,7 +80,12 @@ int main(int argc, char** argv)
 
     // run process
     parseByFileList(&app, (&app)->listOfFiles, app.listOfFilesCount, cwd);
-  
+
+    if(app.starParse || app.folderParse) {
+        if(folderBerhasil) printf("Direktori sukses disimpan\n");
+        else printf("Yah, gagal disimpan :(\n");
+    }
+
     return 0;
 }
 
@@ -177,8 +184,10 @@ void *moveFile(void *ptr) {
     // move file
 
     int res = rename(r->filename, dest);
-    if(res != 0) printf("File %d : Sad, gagal :(\n", (*r).index + 1);
-    else printf("File %d : Berhasil Dikategorikan\n", (*r).index + 1);
+    if(res != 0) {
+        printf("File %d : Sad, gagal :(\n", (*r).index + 1);
+        folderBerhasil = false;
+    } else printf("File %d : Berhasil Dikategorikan\n", (*r).index + 1);
 }
 
 // Categorize list of files to dependent folders
