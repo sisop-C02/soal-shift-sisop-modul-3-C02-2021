@@ -82,6 +82,15 @@ int main(int argc, char** argv)
     return 0;
 }
 
+// Initialize FileMoveRequest
+struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName) {
+    struct FileMoveRequest *r = malloc(sizeof(struct FileMoveRequest));
+    r->index = index;
+    r->filename = filename;
+    r->folderName = folderName;
+    return r;
+}
+
 // Parse input for option `-f`
 int parseFilesInput(int argc, char **argv, struct AppManager* app, char *cwd) {
     int k = 0;
@@ -230,7 +239,4 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
         strcpy(argv[(*pointer)], result);
         (*pointer) = (*pointer) +1;
     }
-
-    // Close directory stream
-    closedir(dir);
 }
