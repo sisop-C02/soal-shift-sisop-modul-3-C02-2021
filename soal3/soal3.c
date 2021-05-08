@@ -82,7 +82,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-// Create new `file move` request
+// Initialize FileMoveRequest
 struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName) {
     struct FileMoveRequest *r = malloc(sizeof(struct FileMoveRequest));
     r->index = index;
@@ -244,7 +244,4 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
     }
 
     free(dp);
-
-    // Close directory stream
-    closedir(dir);
 }
