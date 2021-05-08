@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 void main (int argc, char ** argv) {
+  // input matrix A
   int row1 = 4;
   int col1 = 3;
   int matrix_a[row1][col1];
@@ -14,6 +15,7 @@ void main (int argc, char ** argv) {
     }
   }
 
+  // input matrix B
   int row2 = 3;
   int col2 = 6;
   int row_result = 4;
@@ -24,6 +26,7 @@ void main (int argc, char ** argv) {
       int value;
       scanf("%d", &value);
 
+      // perform the multiplication
       for (int k = 0; k < row1; k++) {
         if (i == 0) {
           matrix_result[k][j] = 0;  
@@ -33,6 +36,7 @@ void main (int argc, char ** argv) {
     }
   }
 
+  // declare shared memroy
   key_t sh_memory_key = 911;
   int sh_memory_id = shmget(sh_memory_key, sizeof(int[row_result][col_result]), IPC_CREAT | 0666);
   if (sh_memory_id == -1) {
@@ -40,6 +44,7 @@ void main (int argc, char ** argv) {
     exit(EXIT_FAILURE);
   }
 
+  // declare shared memory value
   int (* result)[col_result];
   result = shmat(sh_memory_id, NULL, 0);
   if (result == (void *) -1) {
@@ -47,6 +52,7 @@ void main (int argc, char ** argv) {
     exit(EXIT_FAILURE);
   }
 
+  // assign the result to shared memory value
   for (int i = 0; i < row_result; i++) {
     for (int j = 0; j < col_result; j++) {
       result[i][j] = matrix_result[i][j];
@@ -55,6 +61,7 @@ void main (int argc, char ** argv) {
     printf("\n");
   }
 
+  // clear result memory allocation
   shmdt(result);
   // shmctl(sh_memory_id, IPC_RMID, NULL);
   exit(EXIT_SUCCESS);
