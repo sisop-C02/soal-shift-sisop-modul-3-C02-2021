@@ -239,4 +239,6 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
         strcpy(argv[(*pointer)], result);
         (*pointer) = (*pointer) +1;
     }
+
+    free(dp);
 }
