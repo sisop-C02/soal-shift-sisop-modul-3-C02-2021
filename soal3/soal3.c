@@ -29,9 +29,9 @@ struct FileMoveRequest {
 
 struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName);
 int parseFilesInput(int argc, char **argv, struct AppManager* app, char *cwd);
-char * getfolderName(char *filename);
-char * mergeFileWithFolderName(char * filename, char * folderName);
-char *getFileName(char *full_path);
+char* getfolderName(char *filename);
+char* mergeFileWithFolderName(char * filename, char * folderName);
+char* getFileName(char *full_path);
 void *moveFile(void *ptr);
 int parseByFileList(struct AppManager* app, char **listOfFiles, int listOfFilesCount, char *output);
 void listFiles(const char *path, const char *beforePath, char** argv, int* pointer);
@@ -72,14 +72,23 @@ int main(int argc, char** argv)
         listFiles(cwd, cwd, (&app)->listOfFiles, &app.listOfFilesCount);
     }
 
-    for(int i =0;i<app.listOfFilesCount;i++) {
-        printf("%s\n", (&app)->listOfFiles[i]);
-    }
+    // for(int i =0;i<app.listOfFilesCount;i++) {
+    //     printf("%s\n", (&app)->listOfFiles[i]);
+    // }
 
     // run process
     parseByFileList(&app, (&app)->listOfFiles, app.listOfFilesCount, cwd);
   
     return 0;
+}
+
+// Create new `file move` request
+struct FileMoveRequest* NewFileMoveRequest(int index, char * filename, char * folderName) {
+    struct FileMoveRequest *r = malloc(sizeof(struct FileMoveRequest));
+    r->index = index;
+    r->filename = filename;
+    r->folderName = folderName;
+    return r;
 }
 
 // Parse input for option `-f`
@@ -225,11 +234,16 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
         char *result = (char*) malloc((strlen(dp->d_name)+strlen(beforePath)+2)*sizeof(char));
         sprintf(result, "%s%s%s", beforePath, "/", dp->d_name);
         
+        // skip if it is our program file
+        if((strcmp(dp->d_name, "soal3") == 0) || strcmp(dp->d_name, "soal3.c") == 0) continue;
+
         // push file to our list
         argv[(*pointer)] = malloc((strlen(result) + 1) * sizeof(char));
         strcpy(argv[(*pointer)], result);
         (*pointer) = (*pointer) +1;
     }
+
+    free(dp);
 
     // Close directory stream
     closedir(dir);
