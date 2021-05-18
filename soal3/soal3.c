@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     app.fileParse = false;
     app.starParse = false;
     app.folderParse = false;
-    (&app)->listOfFiles = malloc(argc * sizeof(char*));
+    (&app)->listOfFiles = malloc(10000 * sizeof(char*));
     app.listOfFilesCount = 0;
 
     // read input
@@ -173,7 +173,7 @@ void *moveFile(void *ptr) {
     r = (struct FileMoveRequest*) ptr;
 
     char * folderName = getfolderName(r->filename);
-    char * absoluteDestination = (char*) malloc((strlen(r->folderName) +strlen(folderName)+1)*sizeof(char));
+    char * absoluteDestination = (char*) malloc((strlen(r->folderName) +strlen(folderName)+10)*sizeof(char));
     sprintf(absoluteDestination, "%s/%s", r->folderName, folderName);
     
     char * dest = mergeFileWithFolderName(getFileName(r->filename), absoluteDestination);
@@ -187,6 +187,7 @@ void *moveFile(void *ptr) {
     if(res != 0) {
         printf("File %d : Sad, gagal :(\n", (*r).index + 1);
         folderBerhasil = false;
+        // perror("Error: ");
     } else printf("File %d : Berhasil Dikategorikan\n", (*r).index + 1);
 }
 
