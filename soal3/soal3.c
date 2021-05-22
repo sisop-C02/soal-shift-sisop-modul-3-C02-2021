@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <errno.h>
 
 // Struct for app config
 struct AppManager {
@@ -34,6 +35,7 @@ int parseFilesInput(int argc, char **argv, struct AppManager* app, char *cwd);
 char* getfolderName(char *filename);
 char* mergeFileWithFolderName(char * filename, char * folderName);
 char* getFileName(char *full_path);
+int moveFileOS(const char *source, const char *destination);
 void *moveFile(void *ptr);
 int parseByFileList(struct AppManager* app, char **listOfFiles, int listOfFilesCount, char *output);
 void listFiles(const char *path, const char *beforePath, char** argv, int* pointer);
@@ -60,6 +62,18 @@ int main(int argc, char** argv)
             
             break;
         } else if(strcmp(argv[i], "*") == 0) {
+            if (moveFileOS("*", "please.abcdefgh")) {
+                mkdir("*", 0777);
+                moveFileOS("please.abcdefgh", "*/*");
+                printf("msk\n");
+            }
+
+            if (moveFileOS("_", "please.abcdefgh")) {
+                mkdir("_", 0777);
+                moveFileOS("please.abcdefgh", "_/_");
+                printf("msk\n");
+            }
+            
             app.starParse = true;
             break;
         } else if(strcmp(argv[i], "-d") == 0) {
@@ -134,7 +148,7 @@ char * getfolderName(char *filename) {
 
     for (int i=0; i < length; i++) {
         if(filename[i] == '.') {
-            if(i == 0) return hidden;
+            if(filename[i-1] == '/') return hidden;
             else {
                 char * folderName = (char*) malloc((strlen(filename) - i +1)*sizeof(char));
                 sprintf(folderName, "%s", filename+i+1);
@@ -179,15 +193,14 @@ void *moveFile(void *ptr) {
     char * dest = mergeFileWithFolderName(getFileName(r->filename), absoluteDestination);
 
     // make directory for file
-    mkdir(folderName, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(folderName, 0777);
 
     // move file
-
     int res = rename(r->filename, dest);
-    if(res != 0) {
+    int moveFileResult = moveFileOS(r->filename, dest);
+    if(moveFileResult != 1) {
         printf("File %d : Sad, gagal :(\n", (*r).index + 1);
         folderBerhasil = false;
-        // perror("Error: ");
     } else printf("File %d : Berhasil Dikategorikan\n", (*r).index + 1);
 }
 
@@ -216,6 +229,32 @@ int parseByFileList(struct AppManager* app, char **listOfFiles, int listOfFilesC
     return 1;
 }
 
+int moveFileOS(const char *source, const char *destination) {
+    int byte;
+    FILE *fileSource;
+    FILE *fileDestination;
+
+    fileSource = fopen(source, "r");
+
+    if (!fileSource) return 1;
+
+    fileDestination = fopen(destination, "w+");
+
+    if (!fileDestination) return 1;
+
+    while ((byte = fgetc(fileSource)) != EOF)
+    {
+        fputc(byte, fileDestination);
+    }
+
+    fclose(fileSource);
+    fclose(fileDestination);
+
+    remove(source);
+
+    return 1;
+}
+
 // Get all files (absolute path) in a directory *path recursively
 void listFiles(const char *path, const char *beforePath, char** argv, int* pointer)
 {
@@ -228,7 +267,7 @@ void listFiles(const char *path, const char *beforePath, char** argv, int* point
 
     while ((dp = readdir(dir)) != NULL)
     {
-        if(strcmp(dp->d_name, "..") <= 0) continue;
+        if(strcmp(dp->d_name, "..") == 0 || strcmp(dp->d_name, ".") == 0) continue;
 
         if(dp->d_type == DT_DIR) {
             char *result = (char*) malloc((strlen(dp->d_name)+strlen(beforePath)+2)*sizeof(char));
