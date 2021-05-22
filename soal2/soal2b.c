@@ -14,6 +14,7 @@ typedef struct {
 
 // declare the shared memroy value
 int (* result)[6] = {0};
+int threads_mark[4][6] = {0};
 
 // declare the factorial function
 void * count_factorial(void * args) {
@@ -40,6 +41,7 @@ void * count_factorial(void * args) {
 
   // delete the allocation memory
   free(fact_item);
+  threads_mark[fact_item->pos_x][fact_item->pos_y] = 1;
 }
 
 void main (int argc, char ** argv) {
@@ -80,11 +82,15 @@ void main (int argc, char ** argv) {
       args->pos_y = j;
 
       // create the thread
-      if (pthread_create(&fact_thread[fact_thread_index], NULL, count_factorial, args)) {
+      if (pthread_create(&fact_thread[fact_thread_index++], NULL, count_factorial, args)) {
         free(args);
-        continue;
       }
+    }
+  }
 
+  fact_thread_index = 0;
+  for (int i = 0; i < row_result; i++) {
+    for (int j = 0; j < col_result; j++) {
       // wait the thread using join
       pthread_join(fact_thread[fact_thread_index++], NULL);
     }
