@@ -65,13 +65,11 @@ int main(int argc, char** argv)
             if (moveFileOS("*", "please.abcdefgh")) {
                 mkdir("*", 0777);
                 moveFileOS("please.abcdefgh", "*/*");
-                printf("msk\n");
             }
 
             if (moveFileOS("_", "please.abcdefgh")) {
                 mkdir("_", 0777);
                 moveFileOS("please.abcdefgh", "_/_");
-                printf("msk\n");
             }
             
             app.starParse = true;
