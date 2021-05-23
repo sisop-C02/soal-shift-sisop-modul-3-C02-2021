@@ -392,6 +392,8 @@ void split_activities(int chosen_activity) {
 
 ![Screenshot from 2021-05-23 15-09-43](https://user-images.githubusercontent.com/55174646/119257313-e4319f80-bbee-11eb-8670-87fea28969c6.png)
 
+![Screenshot from 2021-05-23 15-12-35](https://user-images.githubusercontent.com/55174646/119260734-4b0a8500-bbfe-11eb-97aa-55751d4c221c.png)
+
 
 #### 1(d) Download files
 Menambahkan file dari server ke client. Akan diminta input berupa nama file. File berupa ```file.txt```. 
