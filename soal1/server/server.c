@@ -40,8 +40,8 @@ bool soal_g(int, char[]);
 //global variables
 bool isOccupied;
 char listofcreds[100][50];
-char server_path[250] = "/home/jaglfr/Documents/revisimod3/server/";
-char client_path[250] = "/home/jaglfr/Documents/revisimod3/client/";
+char server_path[250] = "/home/jaglfr/Documents/SourceCodes/SisOp/Modul3/soal-shift-sisop-modul-3-C02-2021/soal1/server/";
+char client_path[250] = "/home/jaglfr/Documents/SourceCodes/SisOp/Modul3/soal-shift-sisop-modul-3-C02-2021/soal1/client/";
 char folderpath[250];
 char logpath[250];
 char tsvpath[250];
@@ -319,7 +319,7 @@ void update_tsv(char command, char to_tsv[500]) {
 	FILE *ftsv;
 
 	if (command == 'r') {
-		ftsv = fopen(tsvpath, "r+");
+		ftsv = fopen(tsvpath, "a+");
 		char curr_path[500], curr_publ[50], curr_year[50];
 		int counter = 0;
 		while(fscanf(ftsv, "%s\t%s\t%s\n", curr_path, curr_publ, curr_year) != EOF) {
